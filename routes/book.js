@@ -10,7 +10,7 @@ const Issue = require('../models/IssueBook');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, 'public/uploads/');
   },
   filename: function (req, file, cb) {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -24,7 +24,7 @@ router.get('/books', [auth('admin')], async (req, res) => {
     const books = await Book.find();
     return res.json(books);
   } catch (err) {
-    // console.error(err.message);
+    console.error(err.message);
     return res.status(500).send('Server error');
   }
 });
@@ -43,10 +43,10 @@ router.post(
     if (!errors.isEmpty()) {
       // dlt the uploaded pic if validation fails
       if (req.file && req.file.path) {
-        fs.unlink(path.join(__dirname, '../', req.file.path), (err) => {
-          // if (err) {
-          //   console.error('File deleted because validation failed:', err);
-          // }
+        fs.unlink(path.join(__dirname, '../public/', req.file.path), (err) => {
+          if (err) {
+            console.error('File deleted because validation failed:', err);
+          }
         });
       }
       return res.status(400).json({ msg: "Book Validation Failed" });
@@ -59,16 +59,16 @@ router.post(
       if (existingBook) {
         // dlt the uploaded file if the book already exists
         if (req.file && req.file.path) {
-          fs.unlink(path.join(__dirname, '../', req.file.path), (err) => {
-            // if (err) {
-            //   console.error('File deleted because book already exists:', err);
-            // }
+          fs.unlink(path.join(__dirname, '../public/', req.file.path), (err) => {
+            if (err) {
+              console.error('File deleted because book already exists:', err);
+            }
           });
         }
         return res.status(400).json({ msg: 'Book already exists' });
       }
 
-      const image = req.file ? req.file.path : null;
+      const image = req.file ? `uploads/${req.file.filename}` : null;
 
       const newBook = new Book({
         name,
@@ -80,13 +80,13 @@ router.post(
       const book = await newBook.save();
       return res.status(200).json({ msg: 'Book added successfully', book });
     } catch (err) {
-      // console.error(err.message);
+      console.error(err.message);
       // dlt the uploaded pic if any error occurs while adding book
       if (req.file && req.file.path) {
-        fs.unlink(path.join(__dirname, '../', req.file.path), (err) => {
-          // if (err) {
-          //   console.error('File deleted because an error occurred:', err);
-          // }
+        fs.unlink(path.join(__dirname, '../public/', req.file.path), (err) => {
+          if (err) {
+            console.error('File deleted because an error occurred:', err);
+          }
         });
       }
       return res.status(500).json({msg:'Server error'});
@@ -120,7 +120,7 @@ router.put(
       await book.save();
       return res.json({ msg: 'Book quantity updated successfully', book });
     } catch (err) {
-      // console.error(err.message);
+      console.error(err.message);
       return res.status(500).json({ msg: "Server error" });
     }
   }
@@ -137,22 +137,22 @@ router.delete('/deletebook/:id', [auth('admin')], async (req, res) => {
     const issueBook = await Issue.find({ 'book': req.params.id });
 
     if (issueBook.length > 0) {
-      return res.status(400).json({ msg: 'This book is currently issued' });
+      return res.status(400).json({ msg: 'This book is currently issued by student' });
     }
 
     // Check if the path exists before trying to dlt
-    if (book.image && fs.existsSync(path.join(__dirname, '../', book.image))) {
-      fs.unlink(path.join(__dirname, '../', book.image), (err) => {
-        // if (err) {
-        //   console.error('Error while deleting image:', err);
-        // }
+    if (book.image && fs.existsSync(path.join(__dirname, '../public/', book.image))) {
+      fs.unlink(path.join(__dirname, '../public/', book.image), (err) => {
+        if (err) {
+          console.error('Error while deleting image:', err);
+        }
       });
     }
 
     await book.deleteOne();
     return res.json({ msg: 'Book removed' });
   } catch (err) {
-    // console.error(err.message);
+    console.error(err.message);
     return res.status(500).json({msg:'Server error'});
   }
 });
