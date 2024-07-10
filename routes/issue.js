@@ -109,7 +109,7 @@ router.post(
       book.qty -= 1;
       await book.save();
 
-      res.json({ msg: 'Book issued successfully', issue });
+      res.status(200).json({ msg: 'Book issue successfully', issue });
     } catch (err) {
       // console.error(err.message);
       res.status(500).send('Server error');
