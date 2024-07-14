@@ -52,7 +52,9 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendResetEmail = (email, token) => {
-  const resetUrl = `http://localhost:5173/reset-password/${token}`;
+  // https://lms-frontend-blond.vercel.app/
+  // http://localhost:5173
+  const resetUrl = `  https://lms-frontend-blond.vercel.app/reset-password/${token}`;
   const mailOptions = {
     from: EMAIL_USER,
     to: email,
