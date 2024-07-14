@@ -38,6 +38,20 @@ const UserSchema = new mongoose.Schema({
       return new Date().toLocaleString('en-US', options);
     }
   },
+  resetPasswordToken: {
+    type: String,
+    default: '',
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: Date.now,
+  },
+  booksHolding: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Book'
+    }
+  ]
 });
 
 module.exports = mongoose.model('User', UserSchema);

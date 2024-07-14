@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const moment = require('moment-timezone');
 
-const options = { timeZone: 'Asia/Kolkata', hour12: true };
 
 const IssueSchema = new Schema({
   book: {

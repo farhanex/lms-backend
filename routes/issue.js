@@ -109,7 +109,10 @@ router.post(
       book.qty -= 1;
       await book.save();
 
-     return res.status(200).json({ msg: 'Book issue successfully', issue });
+      student.booksHolding.push(book.id);
+      await student.save();
+
+      return res.status(200).json({ msg: 'Book issued successfully', issue });
     } catch (err) {
       // console.error(err.message);
       res.status(500).send('Server error');
@@ -117,7 +120,11 @@ router.post(
   }
 );
 
-router.post('/returnbook', auth('admin',true), async (req, res) => {
+
+
+
+
+router.post('/returnbook', auth('admin'), async (req, res) => {
   const { issueId } = req.body;
 
   try {
@@ -136,14 +143,28 @@ router.post('/returnbook', auth('admin',true), async (req, res) => {
     book.qty += 1;
     await book.save();
 
+    let student = await User.findById(issue.student);
+
+    if (!student) {
+      return res.status(404).json({ msg: 'Student not found' });
+    }
+
+    student.booksHolding = student.booksHolding.filter(
+      (id) => id.toString() !== book._id.toString()
+    );
+    await student.save();
+
     await Issue.findByIdAndDelete(issueId);
 
     res.json({ msg: 'Book returned successfully' });
   } catch (err) {
     // console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({msg:'Server error'});
   }
 });
+
+module.exports = router;
+
 
 router.get('/myhistory', auth('student'), async (req, res) => {
   try {
