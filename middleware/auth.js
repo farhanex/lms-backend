@@ -25,7 +25,7 @@ const auth = (role,  requireSecretKey = false) => {
 
       if (requireSecretKey) {
         const { secretKey } = req.body;
-        if (!secretKey || secretKey !== process.env.JWT_SECRET) {
+        if (!secretKey && secretKey !== process.env.JWT_SECRET) {
           return res.status(401).json({ msg: 'Invalid or missing secret key' });
         }
       }
