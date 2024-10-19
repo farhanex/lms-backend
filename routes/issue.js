@@ -124,7 +124,7 @@ router.post(
 
 
 
-router.post('/returnbook', auth('admin'), async (req, res) => {
+router.post('/returnbook', auth('admin',true), async (req, res) => {
   const { issueId } = req.body;
 
   try {
@@ -162,9 +162,6 @@ router.post('/returnbook', auth('admin'), async (req, res) => {
     res.status(500).json({msg:'Server error'});
   }
 });
-
-module.exports = router;
-
 
 router.get('/myhistory', auth('student'), async (req, res) => {
   try {
