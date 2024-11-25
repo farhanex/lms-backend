@@ -2,7 +2,7 @@
 
 1. **Clone the repository**:
     ```sh
-    git clone https://github.com/farhanoxg/lms-backend.git
+    git clone https://github.com/farhanex/lms-backend.git
     ```
 
 2. **Install backend dependencies**:
